@@ -77,7 +77,7 @@
 
     <section class="ticker" aria-label="Engineering domains">
       <div class="ticker-track">
-        <span>LINUX KERNEL</span><b>◆</b><span>DEVICE DRIVERS</span><b>◆</b><span>ARM</span><b>◆</b><span>PCIe</span><b>◆</b><span>USB</span><b>◆</b><span>DMA</span><b>◆</b><span>SOFTWARE / HARDWARE</span><b>◆</b><span>SO C VALIDATION</span><b>◆</b><span>LINUX KERNEL</span><b>◆</b><span>DEVICE DRIVERS</span><b>◆</b><span>ARM</span><b>◆</b><span>PCIe</span><b>◆</b><span>USB</span><b>◆</b><span>DMA</span></div>
+        <span>LINUX KERNEL</span><b>◆</b><span>DEVICE DRIVERS</span><b>◆</b><span>ARM</span><b>◆</b><span>PCIe</span><b>◆</b><span>USB</span><b>◆</b><span>DMA</span><b>◆</b><span>SOFTWARE / HARDWARE</span><b>◆</b><span>SOC VALIDATION</span><b>◆</b><span>LINUX KERNEL</span><b>◆</b><span>DEVICE DRIVERS</span><b>◆</b><span>ARM</span><b>◆</b><span>PCIe</span><b>◆</b><span>USB</span><b>◆</b><span>DMA</span></div>
     </section>
 
     <section id="capabilities" class="section container reveal">
@@ -86,34 +86,15 @@
         <h2>From silicon behavior<br /><span>to software evidence.</span></h2>
       </div>
       <div class="capability-grid">
-        <article class="capability-card capability-main">
-          <span class="card-num">01</span>
-          <div><h3>Linux & Driver Engineering</h3><p>Kernel modules, character and platform drivers, Device Tree, I2C, SPI, UART, DMA, interrupts and power management.</p></div>
-          <div class="tags"><span>Kernel</span><span>Drivers</span><span>DT</span><span>DMA</span></div>
-        </article>
-        <article class="capability-card">
-          <span class="card-num">02</span>
-          <div><h3>SoC & Post-Silicon Validation</h3><p>Bring-up, registers, interrupts, data paths, PCIe, USB, SDHost, recovery and regression.</p></div>
-          <div class="tags"><span>Bring-up</span><span>PCIe</span><span>USB</span></div>
-        </article>
-        <article class="capability-card">
-          <span class="card-num">03</span>
-          <div><h3>Hardware Debug</h3><p>Correlating software behavior with registers, traces, waveforms and protocol evidence.</p></div>
-          <div class="tags"><span>Trace32</span><span>JTAG</span><span>Protocol</span></div>
-        </article>
-        <article class="capability-card">
-          <span class="card-num">04</span>
-          <div><h3>Validation Automation</h3><p>Python test runners, target adapters, JSON test definitions, evidence capture and regression reporting.</p></div>
-          <div class="tags"><span>Python</span><span>CI</span><span>Regression</span></div>
-        </article>
+        <article class="capability-card capability-main"><span class="card-num">01</span><div><h3>Linux & Driver Engineering</h3><p>Kernel modules, character and platform drivers, Device Tree, I2C, SPI, UART, DMA, interrupts and power management.</p></div><div class="tags"><span>Kernel</span><span>Drivers</span><span>DT</span><span>DMA</span></div></article>
+        <article class="capability-card"><span class="card-num">02</span><div><h3>SoC & Post-Silicon Validation</h3><p>Bring-up, registers, interrupts, data paths, PCIe, USB, SDHost, recovery and regression.</p></div><div class="tags"><span>Bring-up</span><span>PCIe</span><span>USB</span></div></article>
+        <article class="capability-card"><span class="card-num">03</span><div><h3>Hardware Debug</h3><p>Correlating software behavior with registers, traces, waveforms and protocol evidence.</p></div><div class="tags"><span>Trace32</span><span>JTAG</span><span>Protocol</span></div></article>
+        <article class="capability-card"><span class="card-num">04</span><div><h3>Validation Automation</h3><p>Python test runners, target adapters, JSON test definitions, evidence capture and regression reporting.</p></div><div class="tags"><span>Python</span><span>CI</span><span>Regression</span></div></article>
       </div>
     </section>
 
     <section id="work" class="section container reveal">
-      <div class="section-heading split-heading">
-        <div><div class="section-label">02 / SELECTED WORK</div><h2>Projects with an<br /><span>engineering purpose.</span></h2></div>
-        <p>My portfolio is organized around learning by building: tools, drivers, validation labs and repeatable engineering workflows.</p>
-      </div>
+      <div class="section-heading split-heading"><div><div class="section-label">02 / SELECTED WORK</div><h2>Projects with an<br /><span>engineering purpose.</span></h2></div><p>My portfolio is organized around learning by building: tools, drivers, validation labs and repeatable engineering workflows.</p></div>
       <div class="work-grid">
         <a class="project project-large" href="https://github.com/sivaramireddy18/ES-Tools" target="_blank" rel="noreferrer"><div class="project-top"><span>01 / TOOLKIT</span><span>↗</span></div><div class="project-icon">⌁</div><h3>ES-Tools</h3><p>Browser-based Embedded Systems engineering toolkit for interactive experiments, learning and validation-oriented workflows.</p><span class="project-arrow">View repository →</span></a>
         <a class="project project-large" href="https://github.com/sivaramireddy18/Embed-Tools" target="_blank" rel="noreferrer"><div class="project-top"><span>02 / SIMULATION</span><span>↗</span></div><div class="project-icon">◈</div><h3>Embed-Tools</h3><p>Interactive simulators for digital logic, memory, registers, Cortex-M interrupts and communication concepts.</p><span class="project-arrow">View repository →</span></a>
@@ -124,27 +105,12 @@
     </section>
 
     <section id="method" class="section container reveal">
-      <div class="method-shell">
-        <div class="section-label">03 / ENGINEERING METHOD</div>
-        <div class="method-intro"><h2>Don't guess.<br /><span>Measure.</span></h2><p>Hardware problems become manageable when the investigation is systematic. I define the expected behavior, stimulate the DUT, collect evidence and work backwards from the failure to the root cause.</p></div>
-        <div class="method-flow"><div>SPEC</div><span>→</span><div>TEST</div><span>→</span><div>DUT</div><span>→</span><div>EVIDENCE</div><span>→</span><div>DEBUG</div><span>→</span><div>ROOT CAUSE</div><span>→</span><div>REGRESSION</div></div>
-      </div>
+      <div class="method-shell"><div class="section-label">03 / ENGINEERING METHOD</div><div class="method-intro"><h2>Don't guess.<br /><span>Measure.</span></h2><p>Hardware problems become manageable when the investigation is systematic. I define the expected behavior, stimulate the DUT, collect evidence and work backwards from the failure to the root cause.</p></div><div class="method-flow"><div>SPEC</div><span>→</span><div>TEST</div><span>→</span><div>DUT</div><span>→</span><div>EVIDENCE</div><span>→</span><div>DEBUG</div><span>→</span><div>ROOT CAUSE</div><span>→</span><div>REGRESSION</div></div></div>
     </section>
 
-    <section class="section container reveal">
-      <div class="section-label">04 / TECHNOLOGY MAP</div>
-      <div class="tech-map">
-        <div class="tech-group"><span>LANGUAGES</span><strong>C</strong><strong>Python</strong><strong>Bash</strong><strong>C++</strong></div>
-        <div class="tech-group"><span>PLATFORMS</span><strong>Linux</strong><strong>ARM</strong><strong>Embedded Linux</strong><strong>U-Boot</strong></div>
-        <div class="tech-group"><span>INTERFACES</span><strong>PCIe</strong><strong>USB</strong><strong>I2C</strong><strong>SPI</strong><strong>UART</strong><strong>SD/MMC</strong></div>
-        <div class="tech-group"><span>DEBUG</span><strong>Trace32</strong><strong>JTAG</strong><strong>Oscilloscope</strong><strong>Logic Analyzer</strong></div>
-      </div>
-    </section>
+    <section class="section container reveal"><div class="section-label">04 / TECHNOLOGY MAP</div><div class="tech-map"><div class="tech-group"><span>LANGUAGES</span><strong>C</strong><strong>Python</strong><strong>Bash</strong><strong>C++</strong></div><div class="tech-group"><span>PLATFORMS</span><strong>Linux</strong><strong>ARM</strong><strong>Embedded Linux</strong><strong>U-Boot</strong></div><div class="tech-group"><span>INTERFACES</span><strong>PCIe</strong><strong>USB</strong><strong>I2C</strong><strong>SPI</strong><strong>UART</strong><strong>SD/MMC</strong></div><div class="tech-group"><span>DEBUG</span><strong>Trace32</strong><strong>JTAG</strong><strong>Oscilloscope</strong><strong>Logic Analyzer</strong></div></div></section>
 
-    <section class="closing container reveal">
-      <div class="closing-line"></div>
-      <div class="closing-content"><div><span class="section-label">05 / CONNECT</span><h2>Let's build something<br /><span>close to the hardware.</span></h2></div><div class="closing-actions"><a class="btn btn-primary" href="https://github.com/sivaramireddy18" target="_blank" rel="noreferrer">Explore GitHub ↗</a><a class="btn btn-ghost" href="mailto:gsivaramireddy18@gmail.com">Get in touch ↗</a></div></div>
-    </section>
+    <section class="closing container reveal"><div class="closing-line"></div><div class="closing-content"><div><span class="section-label">05 / CONNECT</span><h2>Let's build something<br /><span>close to the hardware.</span></h2></div><div class="closing-actions"><a class="btn btn-primary" href="https://github.com/sivaramireddy18" target="_blank" rel="noreferrer">Explore GitHub ↗</a><a class="btn btn-ghost" href="mailto:gsivaramireddy18@gmail.com">Get in touch ↗</a></div></div></section>
   </main>
 
   <footer class="footer container"><div><strong>SIVA RAMI REDDY</strong><span>Embedded Systems • Linux • SoC Validation</span></div><div class="footer-links"><a href="https://github.com/sivaramireddy18" target="_blank" rel="noreferrer">GitHub</a><a href="mailto:gsivaramireddy18@gmail.com">Email</a></div></footer>
