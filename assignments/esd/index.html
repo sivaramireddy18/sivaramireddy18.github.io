@@ -1,26 +1,173 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ESD | Cortex-M33 + Cortex-M55 | Siva Rami Reddy</title><link rel="stylesheet" href="../../style.css"><style>.page{max-width:1120px;margin:auto;padding:32px 20px 90px}.box{background:rgba(7,18,31,.82);border:1px solid rgba(150,205,232,.14);border-radius:15px;padding:24px;margin:18px 0}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.flow{font:12px 'Space Mono',monospace;white-space:pre-wrap;background:#050c15;border:1px solid #18304a;border-radius:10px;padding:18px;line-height:1.8;overflow:auto}.btn{display:inline-block;padding:10px 14px;border-radius:8px;background:#69ddff;color:#031018;font-weight:700;margin:5px 6px 5px 0}.muted{color:#8da3b4}.metric{font-size:30px;color:#69ddff}.sim input{width:100%;accent-color:#69ddff}.sim label{display:block;margin:12px 0}.sim button{padding:10px 14px;border:0;border-radius:8px;cursor:pointer}.result{font:700 18px 'Space Mono',monospace;margin-top:14px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid rgba(150,205,232,.12);text-align:left}</style></head><body><main class="page"><a href="../../index.html">← Back to Siva Rami Reddy profile</a><header class="box"><span class="eyebrow">EMBEDDED SYSTEM DESIGN • SITUATED LEARNING</span><h1>CM33 + CM55 Heterogeneous MCU</h1><p class="muted">Design and validation of an ARM-based embedded system for real-time sensor acquisition, processing and response.</p><a class="btn" href="../../index.html">Portfolio</a><a class="btn" href="../../projects/cm33-cm55/">Full project</a><a class="btn" href="https://github.com/sivaramireddy18">GitHub</a></header>
-<section class="box"><h2>Problem & engineering objective</h2><p>Modern embedded workloads need both deterministic control and higher computational throughput. This project separates those responsibilities: CM33 manages acquisition/control while CM55 performs computationally intensive sensor processing. The objective is to measure whether this heterogeneous split improves timing and throughput after IPC overhead is included.</p><div class="grid2"><div><b>Inputs</b><p class="muted">ADC/I²C/SPI sensor samples and timing events.</p></div><div><b>Processing</b><p class="muted">Buffering, average/filtering and threshold decision.</p></div><div><b>Outputs</b><p class="muted">UART diagnostics and optional GPIO/actuator indication.</p></div><div><b>Metrics</b><p class="muted">Latency, throughput, integrity, lost samples and accuracy.</p></div></div></section>
-<section class="box"><h2>Architecture</h2><div class="flow">SENSOR → ADC / I²C / SPI → CM33
-                         │
-                         ▼
-                 Timer + NVIC control
-                         │
-                         ▼
-               IPC / SHARED MEMORY
-                         │
-                         ▼
-                       CM55
-                         │
-              Sensor processing / decision
-                         │
-                         ▼
-               IPC / SHARED MEMORY
-                         │
-                         ▼
-                  CM33 → UART / GPIO</div><p class="muted">The target MCU is represented generically. Public PSoC Edge architecture is used only as a reference; confidential registers, memory maps, part numbers and unpublished performance are excluded.</p></section>
-<section class="box"><h2>Firmware design</h2><div class="grid2"><div><h3>CM33</h3><ul><li>Timer/SysTick scheduling</li><li>ADC acquisition</li><li>Fixed 16-sample buffering</li><li>NVIC interrupt handling</li><li>IPC transmit/receive</li><li>UART diagnostics</li></ul></div><div><h3>CM55</h3><ul><li>Packet validation</li><li>Sensor block processing</li><li>Arithmetic mean calculation</li><li>Configurable threshold decision</li><li>Processing-time measurement</li><li>Result returned through IPC</li></ul></div></div></section>
-<section class="box sim"><h2>Interactive ESD timing simulation</h2><p class="muted">Illustrative model for the design decision. It does not represent measured silicon performance.</p><label>Samples per block: <input id="n" type="range" min="4" max="16" value="16" oninput="runSim()"><span id="nv">16</span></label><label>CM33 processing per sample (µs): <input id="c33" type="range" min="1" max="50" value="8" oninput="runSim()"><span id="c33v">8</span></label><label>CM55 processing per sample (µs): <input id="c55" type="range" min="1" max="30" value="3" oninput="runSim()"><span id="c55v">3</span></label><label>One-way IPC overhead (µs): <input id="ipc" type="range" min="1" max="100" value="12" oninput="runSim()"><span id="ipcv">12</span></label><button onclick="runSim()">Recalculate</button><div class="grid2"><div><div class="metric" id="single">—</div><small>CM33-only block time (µs)</small></div><div><div class="metric" id="hetero">—</div><small>CM33 + CM55 estimated block time (µs)</small></div></div><div class="result" id="gain">—</div><p id="simnote" class="muted"></p></section>
-<section class="box"><h2>Communication protocol</h2><table><tr><th>Packet</th><th>Fields</th></tr><tr><td>Sensor packet</td><td>Version, sequence, timestamp, sample count, status, up to 16 samples</td></tr><tr><td>Result packet</td><td>Version, sequence, processing time, processed value, result, status</td></tr><tr><td>Transport</td><td>IPC/shared memory; UART for validation output</td></tr></table></section>
-<section class="box"><h2>Validation plan</h2><table><tr><th>ID</th><th>Test</th><th>Evidence</th></tr><tr><td>IPC-01…10</td><td>Handshake, integrity, sequence, errors, interrupt</td><td>UART/debug trace</td></tr><tr><td>ADC-01</td><td>Known-input acquisition</td><td>Measured samples</td></tr><tr><td>TIM-01 / NVIC-01</td><td>Periodic sampling and interrupt response</td><td>Timing trace</td></tr><tr><td>UART-01</td><td>Serial output</td><td>Terminal capture</td></tr><tr><td>PERF-01</td><td>End-to-end latency</td><td>Measured table/trace</td></tr></table></section>
-<section class="box"><h2>Implementation roadmap</h2><ol><li>CM33 boot + UART.</li><li>CM55 startup.</li><li>Deterministic IPC handshake.</li><li>16-sample packet transfer.</li><li>ADC integration.</li><li>Timer/SysTick + NVIC.</li><li>CM55 processing + result return.</li><li>Timestamping and performance measurement.</li><li>Functional and negative validation.</li><li>Capture evidence for final report.</li></ol></section>
-<section class="box"><h2>Evidence checklist</h2><p class="muted">Add real screenshots/logs here as the project is executed: IDE/build output, CM33 source, CM55 source, UART trace, IPC trace, oscilloscope/logic-analyzer capture, validation results and measured performance.</p><p><b>Important:</b> simulation values on this page are illustrative. Academic submission must use actual hardware/simulation measurements.</p></section></main><script>function runSim(){const n=+document.getElementById('n').value,c33=+document.getElementById('c33').value,c55=+document.getElementById('c55').value,ipc=+document.getElementById('ipc').value;document.getElementById('nv').textContent=n;document.getElementById('c33v').textContent=c33;document.getElementById('c55v').textContent=c55;document.getElementById('ipcv').textContent=ipc;const single=n*c33,hetero=n*c33+2*ipc+n*c55;document.getElementById('single').textContent=single.toFixed(0);document.getElementById('hetero').textContent=hetero.toFixed(0);const g=(single-hetero)/single*100;document.getElementById('gain').textContent=(g>=0?'Estimated reduction: ':'Estimated overhead: ')+Math.abs(g).toFixed(1)+'%';document.getElementById('simnote').textContent=g>=0?'This model indicates a potential benefit under the selected assumptions.':'The selected IPC and processing overhead dominates the workload; a heterogeneous split would not improve end-to-end latency in this model.'}runSim();</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ESD | CM33 + CM55 Heterogeneous MCU | Siva Rami Reddy</title>
+<link rel="stylesheet" href="../../style.css">
+<style>
+.page{max-width:1120px;margin:auto;padding:32px 20px 90px}.box{background:rgba(7,18,31,.82);border:1px solid rgba(150,205,232,.14);border-radius:15px;padding:24px;margin:18px 0}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.flow{font:12px 'Space Mono',monospace;white-space:pre-wrap;background:#050c15;border:1px solid #18304a;border-radius:10px;padding:18px;line-height:1.8;overflow:auto}.btn{display:inline-block;padding:10px 14px;border-radius:8px;background:#69ddff;color:#031018;font-weight:700;margin:5px 6px 5px 0}.muted{color:#8da3b4}.metric{font-size:28px;color:#69ddff}.card{background:#081522;border:1px solid rgba(150,205,232,.10);border-radius:10px;padding:16px}.sim input{width:100%;accent-color:#69ddff}.sim label{display:block;margin:12px 0}.sim button{padding:10px 14px;border:0;border-radius:8px;cursor:pointer}.result{font:700 17px 'Space Mono',monospace;margin-top:14px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid rgba(150,205,232,.12);text-align:left;vertical-align:top}.tag{display:inline-block;border:1px solid rgba(105,221,255,.3);border-radius:20px;padding:5px 9px;margin:3px;font-size:12px}.warn{border-left:3px solid #69ddff;padding-left:14px}.small{font-size:13px}
+</style>
+</head>
+<body>
+<main class="page">
+<a href="../../index.html">← Back to Siva Rami Reddy profile</a>
+<header class="box">
+<span class="eyebrow">EMBEDDED SYSTEM DESIGN • SITUATED LEARNING • 2026–27</span>
+<h1>CM33 + CM55 Heterogeneous MCU</h1>
+<p class="muted">Design and validation of an ARM-based embedded system for real-time sensor acquisition, processing and response.</p>
+<a class="btn" href="../../index.html">Portfolio</a><a class="btn" href="../../projects/cm33-cm55/">CM33 + CM55 project</a><a class="btn" href="https://github.com/sivaramireddy18">GitHub</a>
+<div class="grid3" style="margin-top:18px"><div class="card"><div class="metric">2</div><small>processing domains</small></div><div class="card"><div class="metric">IPC</div><small>inter-core data path</small></div><div class="card"><div class="metric">10</div><small>implementation stages</small></div><div class="card"><div class="metric">TBD</div><small>hardware measurements</small></div></div>
+</header>
+
+<section class="box"><h2>1. Problem & engineering objective</h2>
+<p>Modern embedded workloads need deterministic control as well as computationally intensive signal or sensor processing. The proposed system separates those responsibilities between a Cortex-M33 control domain and a Cortex-M55 compute domain.</p>
+<div class="grid2"><div><h3>Problem</h3><p class="muted">A single execution domain may have to perform acquisition, control, communication and heavier processing at the same time, creating timing and power trade-offs.</p></div><div><h3>Objective</h3><p class="muted">Design a heterogeneous embedded architecture and validate its functional behavior, inter-core communication and end-to-end timing.</p></div><div><h3>Inputs</h3><p class="muted">ADC/I²C/SPI sensor samples, timer events and configuration commands.</p></div><div><h3>Outputs</h3><p class="muted">Processed results, UART diagnostics and optional GPIO/actuator indication.</p></div></div>
+</section>
+
+<section class="box"><h2>2. Requirements & constraints</h2>
+<table><tr><th>Category</th><th>Requirement / design target</th></tr><tr><td>Functional</td><td>Acquire samples, buffer them, transfer a packet, process the block and return a result.</td></tr><tr><td>Timing</td><td>Use timer/SysTick scheduling and interrupt-driven events; measure end-to-end latency rather than assuming it.</td></tr><tr><td>Communication</td><td>Use IPC/shared memory for CM33↔CM55 exchange and UART for observability.</td></tr><tr><td>Integrity</td><td>Track sequence numbers, packet state, errors and lost samples.</td></tr><tr><td>Validation</td><td>Provide reproducible functional, negative and performance tests.</td></tr><tr><td>Confidentiality</td><td>Use generic target-MCU terminology; do not publish confidential registers, memory maps, part numbers or unpublished silicon results.</td></tr></table>
+</section>
+
+<section class="box"><h2>3. System architecture</h2>
+<div class="flow">                         TARGET NEXT-GENERATION MCU
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│  SENSOR ──► ADC / I²C / SPI ──► Cortex-M33                    │
+│                                  │                              │
+│                         Timer / NVIC / SysTick                  │
+│                                  │                              │
+│                         Buffer + packet                         │
+│                                  │                              │
+│                         IPC / shared memory                     │
+│                                  │                              │
+│                                  ▼                              │
+│                           Cortex-M55                            │
+│                    Filtering / processing                       │
+│                                  │                              │
+│                         IPC / shared memory                     │
+│                                  │                              │
+│                                  ▼                              │
+│                  Cortex-M33 → UART / GPIO / actuator            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘</div>
+<div class="grid2"><div><h3>CM33 — control domain</h3><ul><li>System initialization</li><li>Sensor acquisition</li><li>Timing and interrupts</li><li>Buffer ownership</li><li>IPC coordination</li><li>Diagnostics and system response</li></ul></div><div><h3>CM55 — compute domain</h3><ul><li>Receive/validate packet</li><li>Compute sensor metrics</li><li>Run signal-processing workload</li><li>Measure processing time</li><li>Return result/status</li></ul></div></div>
+<p class="muted warn">Architecture note: the target MCU is represented generically. Public PSoC Edge material may be used as a reference architecture, but this page does not claim the target device is identical to it.</p>
+</section>
+
+<section class="box"><h2>4. Hardware & software integration</h2>
+<div class="grid2"><div class="card"><h3>Hardware blocks</h3><p class="muted">MCU cores, ADC/sensor interface, timer, interrupt controller, memory/shared buffer, UART and optional GPIO/actuator interface.</p><p><span class="tag">ADC</span><span class="tag">Timer</span><span class="tag">UART</span><span class="tag">I²C/SPI</span><span class="tag">IPC</span></p></div><div class="card"><h3>Software blocks</h3><p class="muted">Startup, HAL, acquisition driver, packet layer, IPC service, processing algorithm, timing instrumentation and validation logger.</p><p><span class="tag">Embedded C</span><span class="tag">NVIC</span><span class="tag">SysTick</span><span class="tag">Shared memory</span></p></div></div>
+<h3>Firmware flow</h3><div class="flow">BOOT
+  ↓
+CM33 initialization → UART + timer + sensor interface
+  ↓
+Acquire sample → buffer → packetize
+  ↓
+Signal CM55 through IPC
+  ↓
+CM55 validates packet → processes block → timestamps execution
+  ↓
+Return result/status through IPC
+  ↓
+CM33 validates result → UART/GPIO response
+  ↓
+Repeat / handle error</div>
+</section>
+
+<section class="box"><h2>5. Firmware design</h2>
+<div class="grid2"><div><h3>CM33 responsibilities</h3><ol><li>Initialize platform and observability.</li><li>Configure periodic acquisition.</li><li>Capture samples into a bounded buffer.</li><li>Generate IPC request.</li><li>Handle completion/error events.</li><li>Publish timing and validation logs.</li></ol></div><div><h3>CM55 responsibilities</h3><ol><li>Wait for a valid work packet.</li><li>Check sequence/count/status.</li><li>Run the processing kernel.</li><li>Measure processing duration.</li><li>Generate result/status.</li><li>Return ownership to CM33.</li></ol></div></div>
+<h3>Illustrative Embedded C structure</h3><div class="flow">typedef struct {
+    uint32_t sequence;
+    uint32_t timestamp;
+    uint16_t sample_count;
+    uint16_t samples[16];
+    uint32_t status;
+} sensor_packet_t;
+
+/* CM33 */
+acquire_samples(&packet);
+ipc_send_sensor_packet(&packet);
+
+/* CM55 */
+if (validate_packet(&packet)) {
+    result = process_sensor_block(packet.samples,
+                                  packet.sample_count);
+    ipc_send_result(&result);
+}</div>
+<p class="muted small">The code is intentionally hardware-agnostic. Vendor-specific startup, register definitions, linker configuration and IPC primitives must be mapped only when the actual target environment is available.</p>
+</section>
+
+<section class="box"><h2>6. Peripheral, interrupt & timing design</h2>
+<table><tr><th>Peripheral / mechanism</th><th>Role</th><th>Validation evidence</th></tr><tr><td>ADC</td><td>Periodic sensor acquisition</td><td>Known-input samples and error calculation</td></tr><tr><td>Timer / SysTick</td><td>Deterministic scheduling and timestamps</td><td>Measured period / timing trace</td></tr><tr><td>NVIC</td><td>Prioritize acquisition, IPC and fault events</td><td>Interrupt response trace</td></tr><tr><td>UART</td><td>Debug and validation output</td><td>Terminal capture</td></tr><tr><td>IPC</td><td>CM33↔CM55 work/result exchange</td><td>Sequence and latency trace</td></tr></table>
+</section>
+
+<section class="box"><h2>7. IPC protocol</h2>
+<div class="flow">CM33 → CM55
+┌────────┬──────────┬──────────┬──────────┬──────────┐
+│ VERSION│ SEQUENCE │ TIMESTAMP│ COUNT    │ SAMPLES  │
+└────────┴──────────┴──────────┴──────────┴──────────┘
+             + STATUS / ownership state
+
+CM55 → CM33
+┌────────┬──────────┬──────────┬────────────┬────────┐
+│ VERSION│ SEQUENCE │ PROC TIME│ RESULT     │ STATUS │
+└────────┴──────────┴──────────┴────────────┴────────┘</div>
+<p class="muted">Transport: shared memory / IPC. UART is used as an observability channel, not as the inter-core data path in this model.</p>
+</section>
+
+<section class="box sim"><h2>8. Interactive timing model</h2>
+<p class="muted">This is an analytical model for exploring the architecture. It is not measured silicon performance. The simple model assumes acquisition/control work plus two IPC crossings and CM55 processing. It does not assume parallel overlap.</p>
+<label>Samples per block: <input id="n" type="range" min="4" max="16" value="16" oninput="runSim()"><span id="nv">16</span></label>
+<label>CM33 processing per sample (µs): <input id="c33" type="range" min="1" max="50" value="8" oninput="runSim()"><span id="c33v">8</span></label>
+<label>CM55 processing per sample (µs): <input id="c55" type="range" min="1" max="30" value="3" oninput="runSim()"><span id="c55v">3</span></label>
+<label>One-way IPC overhead (µs): <input id="ipc" type="range" min="1" max="100" value="12" oninput="runSim()"><span id="ipcv">12</span></label>
+<button onclick="runSim()">Recalculate</button>
+<div class="grid3" style="margin-top:16px"><div class="card"><div class="metric" id="single">—</div><small>CM33-only model (µs)</small></div><div class="card"><div class="metric" id="hetero">—</div><small>Heterogeneous sequential model (µs)</small></div><div class="card"><div class="metric" id="delta">—</div><small>Difference</small></div></div>
+<div class="result" id="gain">—</div><p id="simnote" class="muted"></p>
+</section>
+
+<section class="box"><h2>9. Validation strategy</h2>
+<p>Validation should move from isolated blocks to integrated behavior and finally to measured performance.</p>
+<table><tr><th>ID</th><th>Test</th><th>Method</th><th>Evidence</th></tr><tr><td>ADC-01</td><td>Known-input acquisition</td><td>Apply known values and compare samples</td><td>Sample table</td></tr><tr><td>TIM-01</td><td>Periodic sampling</td><td>Measure interval over repeated events</td><td>Timing trace</td></tr><tr><td>NVIC-01</td><td>Interrupt priority</td><td>Trigger competing events</td><td>Trace/log</td></tr><tr><td>IPC-01</td><td>Handshake</td><td>Request/acknowledge sequence</td><td>UART/debug log</td></tr><tr><td>IPC-02</td><td>Sequence integrity</td><td>Check ordering and duplicate/lost packets</td><td>Counter report</td></tr><tr><td>IPC-03</td><td>Error handling</td><td>Inject invalid state/packet</td><td>Error log</td></tr><tr><td>UART-01</td><td>Diagnostics</td><td>Verify message format and rate</td><td>Terminal capture</td></tr><tr><td>PERF-01</td><td>End-to-end latency</td><td>Timestamp acquisition to result</td><td>Measured table/trace</td></tr><tr><td>PERF-02</td><td>Throughput</td><td>Count processed blocks over time</td><td>Benchmark</td></tr><tr><td>PERF-03</td><td>Lost samples</td><td>Compare generated and processed sequence counts</td><td>Integrity report</td></tr></table>
+</section>
+
+<section class="box"><h2>10. Performance analysis</h2>
+<div class="grid2"><div><h3>Metrics</h3><ul><li>ADC acquisition accuracy</li><li>IPC latency</li><li>CM55 processing time</li><li>End-to-end response time</li><li>Processing throughput</li><li>Lost/error sample count</li></ul></div><div><h3>Comparison</h3><p class="muted">Compare a CM33-only implementation with the heterogeneous implementation using the same workload and measurement method.</p><div class="flow">Improvement (%) =
+((T_single − T_heterogeneous) / T_single) × 100</div></div></div>
+<p class="warn">No hardware performance number is claimed here until it is measured. Simulation and analytical values must be labelled separately from experimental results.</p>
+</section>
+
+<section class="box"><h2>11. Evidence gallery — to be populated during implementation</h2>
+<div class="grid3"><div class="card"><b>01 · Build</b><p class="muted small">IDE/build output and compiler configuration.</p></div><div class="card"><b>02 · Firmware</b><p class="muted small">CM33 and CM55 source/debug views.</p></div><div class="card"><b>03 · UART</b><p class="muted small">Serial logs showing sequence and results.</p></div><div class="card"><b>04 · IPC</b><p class="muted small">Inter-core request/result trace.</p></div><div class="card"><b>05 · Timing</b><p class="muted small">Oscilloscope/logic-analyzer or timestamp evidence.</p></div><div class="card"><b>06 · Validation</b><p class="muted small">Pass/fail matrix with measured values.</p></div></div>
+</section>
+
+<section class="box"><h2>12. Implementation roadmap</h2>
+<ol><li>CM33 boot and UART observability.</li><li>CM55 startup and basic heartbeat.</li><li>Deterministic IPC handshake.</li><li>Sensor packet transfer with bounded buffer.</li><li>ADC/sensor integration.</li><li>Timer/SysTick and NVIC configuration.</li><li>CM55 processing kernel and result return.</li><li>Timestamp instrumentation.</li><li>Functional, negative and stress validation.</li><li>Capture evidence and compare measured performance.</li></ol>
+</section>
+
+<section class="box"><h2>13. Engineering trade-offs</h2>
+<table><tr><th>Decision</th><th>Benefit</th><th>Trade-off</th></tr><tr><td>Separate control and compute domains</td><td>Clear responsibility and potential concurrency</td><td>IPC and synchronization overhead</td></tr><tr><td>Shared-memory packets</td><td>Efficient bulk data exchange</td><td>Ownership/cache/memory-ordering concerns</td></tr><tr><td>Interrupt-driven events</td><td>Responsive system behavior</td><td>Priority design and debugging complexity</td></tr><tr><td>UART diagnostics</td><td>Simple observability</td><td>Bandwidth and instrumentation overhead</td></tr></table>
+</section>
+
+<section class="box"><h2>14. Lessons & next improvements</h2>
+<ul><li>Validate the communication mechanism before optimizing the processing kernel.</li><li>Measure end-to-end behavior; core execution time alone is insufficient.</li><li>Keep shared-buffer ownership and synchronization explicit.</li><li>Separate analytical models from experimental measurements.</li><li>Next: add real traces, hardware measurements, a reproducible benchmark and a final results dashboard.</li></ul>
+</section>
+
+<section class="box"><h2>15. References & confidentiality</h2>
+<p class="muted">The assignment methodology, ARM concepts and publicly available reference-architecture material inform this page. Public PSoC Edge information is treated only as a reference for architectural discussion. Confidential target-MCU implementation details are intentionally omitted.</p>
+<p><a class="btn" href="../../projects/cm33-cm55/">Detailed CM33 + CM55 project</a><a class="btn" href="../pad/">PAD assignment</a><a class="btn" href="../../index.html">Main portfolio</a></p>
+</section>
+</main>
+<script>
+function runSim(){
+ const n=+document.getElementById('n').value,c33=+document.getElementById('c33').value,c55=+document.getElementById('c55').value,ipc=+document.getElementById('ipc').value;
+ document.getElementById('nv').textContent=n;document.getElementById('c33v').textContent=c33;document.getElementById('c55v').textContent=c55;document.getElementById('ipcv').textContent=ipc;
+ const single=n*c33,hetero=n*c33+2*ipc+n*c55,diff=hetero-single;
+ document.getElementById('single').textContent=single.toFixed(0);document.getElementById('hetero').textContent=hetero.toFixed(0);document.getElementById('delta').textContent=(diff>=0?'+':'')+diff.toFixed(0)+' µs';
+ const pct=Math.abs(diff)/single*100;
+ document.getElementById('gain').textContent=diff>=0?'Modelled overhead: '+pct.toFixed(1)+'%':'Modelled reduction: '+pct.toFixed(1)+'%';
+ document.getElementById('simnote').textContent=diff>=0?'Under these assumptions, IPC plus CM55 work costs more than the CM33-only model. A real implementation may benefit if acquisition/control overlaps with compute; that requires measurement or a more detailed concurrency model.':'Under these assumptions, the heterogeneous path is lower. This remains an analytical estimate until measured on the target platform.';
+}
+runSim();
+</script>
+</body>
+</html>
